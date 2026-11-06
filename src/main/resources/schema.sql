@@ -1,0 +1,14 @@
+CREATE TABLE IF NOT EXISTS cafes (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(120) NOT NULL,
+    address VARCHAR(500) NOT NULL,
+    rating DECIMAL(2, 1) NOT NULL,
+    visited_at DATE NOT NULL,
+    memo VARCHAR(5000),
+    photo_url VARCHAR(2048),
+    photo_key VARCHAR(1024),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_cafes_visited_at (visited_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
