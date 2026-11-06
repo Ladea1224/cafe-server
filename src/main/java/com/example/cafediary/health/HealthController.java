@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/health")
 public class HealthController {
 	// CI/CD 배포 확인 시 이 값을 바꾸면 응답에서 새 배포 여부를 확인할 수 있습니다.
-	private static final String DEPLOY_MARKER = "health-check-v1";
+	private static final String DEPLOY_MARKER = "health-check-v2";
 
 	private final JdbcTemplate jdbcTemplate;
 
