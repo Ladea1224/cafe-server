@@ -11,4 +11,10 @@ jobs:
 
     steps:
       - name: Hello World 찍ㄱㅣ
-        run: echo "Hello World!!"
+        run: | 
+          echo "Hello!"
+          echo "World!!"
+      - name: Github Actions 변수 써보기
+        run: |
+          echo $GITHUB_SHA
+          echo $GITHUB_REPOSITORY
