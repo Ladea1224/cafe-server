@@ -8,6 +8,7 @@ class CafeDiaryApiApplicationTests {
 
 	@Test
 	void contextLoads() {
+		throw new RuntimeException();
 	}
 
 }
