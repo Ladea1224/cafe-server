@@ -61,6 +61,7 @@ DB 접속은 `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`로 바꿀 수 있습니다. 
 
 | Method | Path | 설명 |
 |---|---|---|
+| GET | `/api/health` | API 및 MySQL 연결 상태 확인 |
 | GET | `/api/cafes` | 방문 기록 목록 (방문일 최신순) |
 | GET | `/api/cafes/{id}` | 방문 기록 상세 |
 | POST | `/api/cafes` | 방문 기록 등록 (성공 시 201) |
@@ -97,3 +98,11 @@ curl.exe -X PUT http://localhost:8080/api/cafes/1 `
 ```
 
 목록/상세 조회는 `curl http://localhost:8080/api/cafes` 및 `curl http://localhost:8080/api/cafes/1`로 호출하고, 삭제는 `curl.exe -X DELETE http://localhost:8080/api/cafes/1`로 호출합니다.
+
+헬스체크:
+
+```powershell
+curl.exe http://localhost:8080/api/health
+```
+
+응답의 `status`가 `UP`이면 DB 연결이 정상입니다. CI/CD 배포 확인용 응답 표식은 `HealthController`의 `DEPLOY_MARKER` 상수에서 수정할 수 있습니다.
