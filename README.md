@@ -43,6 +43,12 @@ DB 접속은 `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`로 바꿀 수 있습니다. 
 
 기본 허용 origin은 `http://localhost:3000`과 `http://localhost:5173`입니다. 프론트엔드 주소에 맞춰 `CORS_ALLOWED_ORIGINS`에 쉼표로 구분한 origin을 지정하세요.
 
+## RAG 서버 연결
+
+Spring은 `POST /api/chat` 요청을 FastAPI의 `POST /chat`으로 전달합니다. 같은 EC2에서 두 서버를 직접 실행할 때 기본 `RAG_BASE_URL`은 `http://127.0.0.1:8000`입니다. 서로 다른 Docker 컨테이너라면 같은 Docker 네트워크에서 FastAPI 서비스 이름을 사용해 `RAG_BASE_URL=http://fastapi:8000`처럼 설정하세요.
+
+`RAG_CONNECT_TIMEOUT` 기본값은 `5s`, `RAG_READ_TIMEOUT`은 `210s`입니다. FastAPI의 모델 호출 최대 60초와 최대 2회 재시도를 고려한 값입니다. Spring에서는 중복 Gemini 호출을 막기 위해 자동 재시도하지 않습니다. 이 프로젝트에는 Spring Security가 없어 chat API에도 별도 인증을 적용하지 않았습니다.
+
 ## API
 
 모든 성공 응답의 카페 객체는 아래 필드를 사용합니다. `visitedAt`은 `YYYY-MM-DD` 문자열이며, 사진이 없으면 `photoUrl`은 `null`입니다.
@@ -62,11 +68,22 @@ DB 접속은 `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`로 바꿀 수 있습니다. 
 | Method | Path | 설명 |
 |---|---|---|
 | GET | `/api/health` | API 및 MySQL 연결 상태 확인 |
+| POST | `/api/chat` | 질문을 FastAPI RAG 서버로 전달 |
 | GET | `/api/cafes` | 방문 기록 목록 (방문일 최신순) |
 | GET | `/api/cafes/{id}` | 방문 기록 상세 |
 | POST | `/api/cafes` | 방문 기록 등록 (성공 시 201) |
 | PUT | `/api/cafes/{id}` | 방문 기록 수정 |
 | DELETE | `/api/cafes/{id}` | 방문 기록 삭제 (성공 시 204) |
+
+질문 요청 예시:
+
+```powershell
+curl.exe -X POST http://localhost:8080/api/chat `
+  -H "Content-Type: application/json" `
+  -d '{"question":"재택근무는 일주일에 며칠까지 가능한가요?"}'
+```
+
+정상 응답은 FastAPI의 `answer`, `sources`를 그대로 반환합니다. 출처의 `page`는 nullable 숫자입니다. 공백 질문 또는 4,000자 초과 질문은 400, RAG 연결 실패는 503, 타임아웃은 504, FastAPI 오류/잘못된 응답은 502와 기존 `{"error":"..."}` 형식으로 반환합니다.
 
 등록과 수정은 `multipart/form-data`입니다. `data` 파트는 `application/json`, `photo` 파트는 선택 이미지 파일입니다. 사진 없이 수정하면 기존 `photoUrl`이 유지됩니다. 사진을 새로 올려 교체하면 이전 S3 객체를 삭제하고, 카페 삭제 시 연결된 S3 객체도 삭제합니다.
 
